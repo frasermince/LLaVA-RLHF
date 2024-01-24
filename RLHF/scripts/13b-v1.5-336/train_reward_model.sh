@@ -3,11 +3,11 @@
 set -e
 set -x
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=0
 export DATA_DIR="/path/to/your/data/directory"
 export MODEL_DIR="/path/to/your/model/directory"
 export PYTHONPATH="$PWD:$PYTHONPATH"
-export GPUS_PER_NODE=8
+export GPUS_PER_NODE=1
 export OMP_NUM_THREADS=8
 
 
@@ -24,8 +24,8 @@ MODEL_NAME=LLaVA-Fact-RM-13b-v1.5-336-lora-padding
 # TRAINING CONFIG
 NUM_EPOCHS=1
 LEARNING_RATE=2e-5
-BATCH_SIZE=4
-GRAD_ACCUMULATION=1
+BATCH_SIZE=2
+GRAD_ACCUMULATION=4
 
 torchrun \
     --standalone \

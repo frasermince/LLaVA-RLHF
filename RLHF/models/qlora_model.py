@@ -18,7 +18,7 @@ from os.path import join, exists
 
 import torch
 import bitsandbytes as bnb
-from transformers import BitsAndBytesConfig
+from transformers import BitsAndBytesConfig, LlavaForConditionalGeneration
 
 from peft import (
     prepare_model_for_kbit_training,
@@ -108,9 +108,11 @@ def get_accelerate_model(
         assert args.bits in [16, 32]
 
     print(f"loading base model {args.model_name_or_path}...")
-
-    model = LlavaLlamaForCausalLM.from_pretrained(
-        args.model_name_or_path,
+    model_id = "llava-hf/bakLlava-v1-hf"
+    model = LlavaForConditionalGeneration.from_pretrained(
+        model_id,
+        torch_dtype=torch.float16,
+        low_cpu_mem_usage=True,
         load_in_4bit=args.bits == 4,
         load_in_8bit=args.bits == 8,
         device_map={"": current_device},
@@ -131,6 +133,7 @@ def get_accelerate_model(
         ),
         trust_remote_code=args.trust_remote_code,
     )
+
     if compute_dtype == torch.float16 and args.bits == 4:
         major, minor = torch.cuda.get_device_capability()
         if major >= 8:
